@@ -7,3 +7,11 @@
 /build
 /captures
 .externalNativeBuild
+.idea/gradle.xml
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/sbt.xml
+app/libs/
+app/src/main/res/drawable/
+gradle/

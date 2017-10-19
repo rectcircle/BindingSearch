@@ -1,0 +1,15 @@
+{
+  "version": "0.1",
+  "requireUrls": [
+    {
+      "name": "百度",
+      "url":"https://passport.baidu.com/v2/?regphonecheck&apiver=v3&phone={{phone}}",
+      "loginUrl":"https://passport.baidu.com",
+      "logoUrl":"https://www.baidu.com/favicon.ico",
+      "prefix": "{{",
+      "suffix": "}}",
+      "isBind": "手机号已被注册",
+      "noBind": "成功"
+    }
+  ]
+}
