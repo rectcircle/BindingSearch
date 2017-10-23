@@ -14,7 +14,6 @@ public class AssetUtil {
 	 * @return
 	 */
 	public static String readString(Context mContext, String fileName) {
-		// TODO Auto-generated method stub
 		StringBuilder sb = new StringBuilder();
 		AssetManager am = mContext.getAssets();
 		try {
@@ -25,7 +24,6 @@ public class AssetUtil {
 				sb.append(next);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			sb.delete(0, sb.length());
 		}

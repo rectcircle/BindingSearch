@@ -73,15 +73,14 @@ public class MainActivity extends AppCompatActivity {
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
 		retrofitConfig = new Retrofit.Builder()
-				.baseUrl("https://www.rectcircle.cn/article/")
-				.addConverterFactory(ScalarsConverterFactory.create())
+				.baseUrl(GITHUB_CONTENT_URL)
+				.addConverterFactory(GsonConverterFactory.create())
 				.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
 				.build();
 
-
 		retrofitNumberApi = new Retrofit.Builder()
-				.baseUrl(GITHUB_CONTENT_URL)
-				.addConverterFactory(GsonConverterFactory.create())
+				.baseUrl("https://www.rectcircle.cn/article/")
+				.addConverterFactory(ScalarsConverterFactory.create())
 				.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
 				.build();
 
