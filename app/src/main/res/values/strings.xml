@@ -1,3 +1,5 @@
 <resources>
 	<string name="app_name">BindingSearch</string>
+	<string name="search">Search</string>
+	<string name="please_input_your_phone_number">please input your phone number</string>
 </resources>
