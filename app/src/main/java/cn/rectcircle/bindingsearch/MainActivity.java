@@ -9,32 +9,40 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import cn.rectcircle.bindingsearch.model.RequireUrls;
 import cn.rectcircle.bindingsearch.model.Version;
 import cn.rectcircle.bindingsearch.service.RequireConfigService;
 import cn.rectcircle.bindingsearch.service.RequireUrlsService;
 import cn.rectcircle.bindingsearch.util.AssetUtil;
 import cn.rectcircle.bindingsearch.util.FileUtil;
+import cn.rectcircle.bindingsearch.util.I18NUtil;
 import cn.rectcircle.bindingsearch.util.NetWorkStateUtil;
 import com.google.gson.Gson;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.adapter.rxjava2.HttpException;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
+
+import java.net.ConnectException;
 
 //控制器
 public class MainActivity extends AppCompatActivity {
 
 
 	//常量
-	private static final String GITHUB_USER="rectcircle"; //github 仓库用户
-	private static final String GITHUB_CONTENT_URL="https://raw.githubusercontent.com/"; //读取github上内容的地址
+	private static final String GITHUB_CONTENT_URL="https://github.com/rectcircle/"; //读取github上内容的地址
+	private static final String GITEE_CONTENT_URL="https://gitee.com/null_834/"; //读取github上内容的地址
+
+
 	private static final String VERSION_FILE_NAME = "version.json"; //配置版本的位置
 	private static final String REQUIREURLS_FILE_NAME = "requireUrls.json"; //配置文件
 	private static final String CONFIG_VERSION = "cn.rectcircle.bindingsearch.CONFIG_VERSION";
@@ -60,8 +68,11 @@ public class MainActivity extends AppCompatActivity {
 	private Version version;
 	private RequireUrls requireUrls;
 
+	//标记量
 	private boolean finishUpdateConfig = false;
 
+	//成员
+	private String gitCongigUrl = GITHUB_CONTENT_URL; //请求配置的地址
 
 
 	@Override
@@ -72,8 +83,12 @@ public class MainActivity extends AppCompatActivity {
 		textViewTest = (TextView) findViewById(R.id.textViewTest);
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
+		if(I18NUtil.isZh(this)){
+			gitCongigUrl = GITEE_CONTENT_URL;
+		}
+
 		retrofitConfig = new Retrofit.Builder()
-				.baseUrl(GITHUB_CONTENT_URL)
+				.baseUrl(gitCongigUrl)
 				.addConverterFactory(GsonConverterFactory.create())
 				.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
 				.build();
@@ -145,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
 	private void showNetworkAlertDialog(){
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		dialog.setTitle("Tips");
-		dialog.setMessage("The app need network!");
+		dialog.setMessage("The app need network!\nPlease check the network settings");
 		dialog.setCancelable(false); //禁止通过返回键取消
 		dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			@Override
@@ -165,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
 	private void changeConfig(){
 		showProgressBar();
 		requireConfigService
-				.checkUrlsVersion(GITHUB_USER) //首先请求获取Api的版本信息
+				.checkUrlsVersion() //首先请求获取Api的版本信息
 				.flatMap(new Function<Version, ObservableSource<RequireUrls>>() {
 					@Override
 					public ObservableSource<RequireUrls> apply(Version version) throws Exception {
@@ -173,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
 							MainActivity.this.version = version;
 							return Observable.just(MainActivity.this.requireUrls); //直接返回内置配置
 						} else {
-							return requireConfigService.getRequireUrls(GITHUB_USER); //再执行一次请求
+							return requireConfigService.getRequireUrls(); //再执行一次请求
 						}
 					}
 				})
@@ -189,6 +204,20 @@ public class MainActivity extends AppCompatActivity {
 						editor.apply();
 						//保存配置文件到内部存储
 						FileUtil.saveString(MainActivity.this, REQUIREURLS_FILE_NAME, gson.toJson(requireUrls));
+					}
+				}, new Consumer<Throwable>() {
+					@Override
+					public void accept(Throwable throwable) throws Exception {
+						//ConnectException exception = (ConnectException)throwable;
+						Toast.makeText(MainActivity.this,
+								throwable.toString(),
+								Toast.LENGTH_LONG).show();
+						showNetworkAlertDialog();
+						hideProgressBar();
+					}
+				}, new Action() {
+					@Override
+					public void run() throws Exception {
 						hideProgressBar();
 					}
 				});

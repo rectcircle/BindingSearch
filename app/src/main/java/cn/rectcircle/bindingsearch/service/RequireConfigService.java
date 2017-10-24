@@ -14,9 +14,9 @@ import java.util.Map;
  *
  */
 public interface RequireConfigService {
-	@GET("{user}/BindingSearch/master/requireUrls.json")
-	Observable<RequireUrls> getRequireUrls(@Path("user") String user);
+	@GET("BindingSearch/raw/master/requireUrls.json")
+	Observable<RequireUrls> getRequireUrls();
 
-	@GET("{user}/BindingSearch/master/version.json")
-	Observable<Version> checkUrlsVersion(@Path("user") String user);
+	@GET("BindingSearch/raw/master/version.json")
+	Observable<Version> checkUrlsVersion();
 }
