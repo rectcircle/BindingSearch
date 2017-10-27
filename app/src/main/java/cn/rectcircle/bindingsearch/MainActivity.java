@@ -6,10 +6,13 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import cn.rectcircle.bindingsearch.adapter.BindingAdapter;
 import cn.rectcircle.bindingsearch.model.RequireUrls;
 import cn.rectcircle.bindingsearch.model.Version;
 import cn.rectcircle.bindingsearch.service.RequireConfigService;
@@ -26,15 +29,14 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.adapter.rxjava2.HttpException;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-import java.net.ConnectException;
-
-//控制器
+/**
+ * 控制器
+ */
 public class MainActivity extends AppCompatActivity {
 
 
@@ -42,14 +44,11 @@ public class MainActivity extends AppCompatActivity {
 	private static final String GITHUB_CONTENT_URL="https://github.com/rectcircle/"; //读取github上内容的地址
 	private static final String GITEE_CONTENT_URL="https://gitee.com/null_834/"; //读取github上内容的地址
 
-
 	private static final String VERSION_FILE_NAME = "version.json"; //配置版本的位置
 	private static final String REQUIREURLS_FILE_NAME = "requireUrls.json"; //配置文件
 	private static final String CONFIG_VERSION = "cn.rectcircle.bindingsearch.CONFIG_VERSION";
 
-
 	//Android内置对象
-	private TextView textViewTest;
 	private ProgressBar progressBar;
 	private SharedPreferences sharedPref;
 	//ProgressBar
@@ -57,8 +56,6 @@ public class MainActivity extends AppCompatActivity {
 
 	//工具对象
 	private Gson gson = new Gson();
-	private Retrofit retrofitConfig; //http请求器，负责请求、获取配置
-	private Retrofit retrofitNumberApi;
 
 	//服务对象
 	private RequireConfigService requireConfigService; //请求配置
@@ -67,12 +64,19 @@ public class MainActivity extends AppCompatActivity {
 	//数据缓存对象
 	private Version version;
 	private RequireUrls requireUrls;
+	//TODO 添加请求状态相关的缓存
 
 	//标记量
 	private boolean finishUpdateConfig = false;
 
 	//成员
-	private String gitCongigUrl = GITHUB_CONTENT_URL; //请求配置的地址
+	private String gitConfigUrl = GITHUB_CONTENT_URL; //请求配置的地址
+
+	//视图对象
+	private RecyclerView bindingRecyclerView;
+
+	//适配器对象
+	private BindingAdapter bindingAdapter;
 
 
 	@Override
@@ -80,27 +84,23 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		textViewTest = (TextView) findViewById(R.id.textViewTest);
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
 		if(I18NUtil.isZh(this)){
-			gitCongigUrl = GITEE_CONTENT_URL;
+			gitConfigUrl = GITEE_CONTENT_URL;
 		}
 
-		retrofitConfig = new Retrofit.Builder()
-				.baseUrl(gitCongigUrl)
+		requireConfigService = new Retrofit.Builder()
+				.baseUrl(gitConfigUrl)
 				.addConverterFactory(GsonConverterFactory.create())
 				.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-				.build();
+				.build().create(RequireConfigService.class);
 
-		retrofitNumberApi = new Retrofit.Builder()
+		requireUrlsService = new Retrofit.Builder()
 				.baseUrl("https://www.rectcircle.cn/article/")
 				.addConverterFactory(ScalarsConverterFactory.create())
 				.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-				.build();
-
-		requireConfigService = retrofitConfig.create(RequireConfigService.class);
-		requireUrlsService = retrofitNumberApi.create(RequireUrlsService.class);
+				.build().create(RequireUrlsService.class);
 
 		//从apk包中读取配置文件
 		version = gson.fromJson(AssetUtil.readString(this, VERSION_FILE_NAME),
@@ -110,7 +110,10 @@ public class MainActivity extends AppCompatActivity {
 
 		sharedPref = getPreferences(Context.MODE_PRIVATE);
 
-
+		//初始化bindingRecyclerView视图
+		bindingRecyclerView = (RecyclerView) findViewById(R.id.binding_recycler_view);
+		LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+		bindingRecyclerView.setLayoutManager(linearLayoutManager);
 	}
 
 
@@ -148,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
 		if(NetWorkStateUtil.isNetworkConnected(this)){
 			//从网络中检查配置
-			changeConfig();
+			changeConfigFromNetwork();
 		} else {
 			showNetworkAlertDialog();
 		}
@@ -177,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
 		dialog.show();
 	}
 
-	private void changeConfig(){
+	private void changeConfigFromNetwork(){
 		showProgressBar();
 		requireConfigService
 				.checkUrlsVersion() //首先请求获取Api的版本信息
@@ -204,6 +207,9 @@ public class MainActivity extends AppCompatActivity {
 						editor.apply();
 						//保存配置文件到内部存储
 						FileUtil.saveString(MainActivity.this, REQUIREURLS_FILE_NAME, gson.toJson(requireUrls));
+						//继续初始化bindingRecyclerView视图
+						bindingAdapter = new BindingAdapter(requireUrls.getRequireUrls());
+						bindingRecyclerView.setAdapter(bindingAdapter);
 					}
 				}, new Consumer<Throwable>() {
 					@Override
@@ -243,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
 				.subscribe(new Consumer<String>() {
 					@Override
 					public void accept(String s) throws Exception {
-						textViewTest.setText(s);
+						//textViewTest.setText(s);
 					}
 				});
 	}

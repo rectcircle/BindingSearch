@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="5dp"
+		android:layout_marginBottom="2dp"
+		android:layout_marginTop="2dp">
+
+	<LinearLayout
+			xmlns:android="http://schemas.android.com/apk/res/android"
+			android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="10dp"
+			android:layout_marginBottom="5dp"
+			android:layout_marginTop="5dp">
+		<ImageView
+				android:adjustViewBounds="true"
+				android:id="@+id/logo_img"
+				android:layout_width="wrap_content"
+				android:src="@mipmap/ic_launcher"
+				android:maxWidth="64dp"
+				android:maxHeight="64dp"
+				android:layout_height="wrap_content"/>
+
+		<LinearLayout
+				android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_marginLeft="5dp">
+
+
+			<LinearLayout
+					xmlns:android="http://schemas.android.com/apk/res/android"
+					android:orientation="vertical"
+					android:layout_width="0dp"
+					android:layout_weight="1"
+					android:layout_height="match_parent"
+					android:layout_marginLeft="10dp">
+				<TextView
+						android:id="@+id/website_name"
+						android:layout_width="match_parent"
+						android:layout_height="0dp"
+						android:layout_weight="1"
+						android:layout_gravity="center_vertical"
+						android:gravity="center_vertical"
+						android:text="百度"
+						android:lines="1"
+						android:ellipsize="end"
+						android:textSize="20sp"
+						android:textColor="#000"/>
+
+				<TextView
+						android:id="@+id/state"
+						android:layout_width="match_parent"
+						android:layout_height="0dp"
+						android:layout_weight="1"
+						android:layout_gravity="center_vertical"
+						android:gravity="center_vertical"
+						android:text="加载中..."/>
+			</LinearLayout>
+			<LinearLayout
+					xmlns:android="http://schemas.android.com/apk/res/android"
+					android:orientation="horizontal"
+					android:layout_width="0dp"
+					android:layout_weight="1"
+					android:layout_height="match_parent">
+
+				<Button
+						android:text="Open"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:id="@+id/open"
+						android:textAllCaps="false"
+						android:layout_weight="1"
+						android:backgroundTint="@color/colorPrimaryDark"
+						android:textColor="#fff"/>
+				<Button
+						android:text="Share"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textAllCaps="false"
+						android:id="@+id/share"
+						android:layout_weight="1"
+						android:backgroundTint="@color/colorPrimary"
+						android:textColor="#fff"/>
+			</LinearLayout>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+	<View
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:background="#bbb"/>
+
+</LinearLayout>
