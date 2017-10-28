@@ -17,6 +17,7 @@ import cn.rectcircle.bindingsearch.model.BindingState;
 import cn.rectcircle.bindingsearch.model.RequireUrl;
 import cn.rectcircle.bindingsearch.service.DownloadService;
 import cn.rectcircle.bindingsearch.service.RequireUrlsService;
+import cn.rectcircle.bindingsearch.util.StringUtil;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -143,44 +144,16 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 							@Override
 							public ObservableSource<String> apply(Response<String> stringResponse) throws Exception {
 								Headers headers = stringResponse.headers();
-								return mRequireUrlsService.get(url, headers.get("Set-Cookie"));
+								List<String> cookieList = headers.values("Set-Cookie");
+								String cookie = StringUtil.getCookieFromSetCookie(cookieList);
+								return mRequireUrlsService.get(
+										url,
+										cookie);
 							}
 						})
 						.subscribeOn(Schedulers.io())
 						.observeOn(AndroidSchedulers.mainThread())
-						.subscribe(
-//								new Observer<String>() {
-//							@Override
-//							public void onSubscribe(Disposable d) {
-//								fstate.setState(BindingState.StateEnum.RUNNING);
-//								notifyDataSetChanged();
-//							}
-//
-//							@Override
-//							public void onNext(String s) {
-//								if(s.contains(requireUrl.getIsBind())){
-//									fstate.setResult(BindingState.ResultEnum.BINDED);
-//								} else if(s.contains(requireUrl.getNoBind())){
-//									fstate.setResult(BindingState.ResultEnum.NOBIND);
-//								} else {
-//									fstate.setResult(BindingState.ResultEnum.UNKNOWN);
-//								}
-//							}
-//
-//							@Override
-//							public void onError(Throwable e) {
-//								fstate.setState(BindingState.StateEnum.ERROR);
-//								notifyDataSetChanged();
-//							}
-//
-//							@Override
-//							public void onComplete() {
-//								fstate.setState(BindingState.StateEnum.FINISHED);
-//								notifyDataSetChanged();
-//							}
-//						}
-								new ResponseObserver(fstate, requireUrl)
-						);
+						.subscribe(new ResponseObserver(fstate, requireUrl));
 
 			} else if(requireUrl.getMethod().toUpperCase().equals("POST")){
 				final String url = requireUrl.getUrl();
@@ -192,9 +165,11 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 							@Override
 							public ObservableSource<String> apply(Response<String> stringResponse) throws Exception {
 								Headers headers = stringResponse.headers();
+								List<String> cookieList = headers.values("Set-Cookie");
+								String cookie = StringUtil.getCookieFromSetCookie(cookieList);
 								return mRequireUrlsService.post(
 										url,
-										headers.get("Set-Cookie"),
+										cookie,
 										field
 								);
 							}

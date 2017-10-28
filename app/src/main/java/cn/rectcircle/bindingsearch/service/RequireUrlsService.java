@@ -20,5 +20,6 @@ public interface RequireUrlsService {
 	Observable<Response<String>> getCookies(@Url String url);
 
 	@POST
+	@FormUrlEncoded
 	Observable<String> post(@Url String url, @Header("Cookie") String cookies, @FieldMap Map<String, String> fieldMap);
 }
