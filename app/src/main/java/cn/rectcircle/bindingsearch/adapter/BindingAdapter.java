@@ -29,7 +29,9 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 绑定信息适配器
@@ -122,13 +124,21 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 			final BindingState fstate = state;
 			final RequireUrl requireUrl = state.getRequireUrl();
 			if(requireUrl.getMethod().toUpperCase().equals("GET")){
-				String target = requireUrl.getPrefix()
+				String targetVal = requireUrl.getPrefix()
 						+ RequireUrl.PHONE_PARAM
 						+ requireUrl.getSuffix();
+				String targetKey = requireUrl.getPrefix()
+						+ RequireUrl.PHONE_KEY_PARAM
+						+ requireUrl.getSuffix();
 
-				final String url = requireUrl.getUrl().replace(target, number);
+				//真正的get方式请求url
+				final String url = requireUrl.getUrl()
+						.replace(targetKey, requireUrl.getPhoneKey())
+						.replace(targetVal, number);
+				//获取cookies的url
+
 				mRequireUrlsService
-						.getCookies(url)
+						.getCookies(requireUrl.getCookieUrl())
 						.flatMap(new Function<Response<String>, ObservableSource<String>>() {
 							@Override
 							public ObservableSource<String> apply(Response<String> stringResponse) throws Exception {
@@ -138,46 +148,108 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 						})
 						.subscribeOn(Schedulers.io())
 						.observeOn(AndroidSchedulers.mainThread())
-						.subscribe(new Observer<String>() {
-							@Override
-							public void onSubscribe(Disposable d) {
-								fstate.setState(BindingState.StateEnum.RUNNING);
-								notifyDataSetChanged();
-							}
-
-							@Override
-							public void onNext(String s) {
-								if(s.contains(requireUrl.getIsBind())){
-									fstate.setResult(BindingState.ResultEnum.BINDED);
-								} else if(s.contains(requireUrl.getNoBind())){
-									fstate.setResult(BindingState.ResultEnum.NOBIND);
-								} else {
-									fstate.setResult(BindingState.ResultEnum.UNKNOWN);
-								}
-							}
-
-							@Override
-							public void onError(Throwable e) {
-								fstate.setState(BindingState.StateEnum.ERROR);
-								notifyDataSetChanged();
-							}
-
-							@Override
-							public void onComplete() {
-								fstate.setState(BindingState.StateEnum.FINISHED);
-								notifyDataSetChanged();
-							}
-						});
-
+						.subscribe(
+//								new Observer<String>() {
+//							@Override
+//							public void onSubscribe(Disposable d) {
+//								fstate.setState(BindingState.StateEnum.RUNNING);
+//								notifyDataSetChanged();
+//							}
+//
+//							@Override
+//							public void onNext(String s) {
+//								if(s.contains(requireUrl.getIsBind())){
+//									fstate.setResult(BindingState.ResultEnum.BINDED);
+//								} else if(s.contains(requireUrl.getNoBind())){
+//									fstate.setResult(BindingState.ResultEnum.NOBIND);
+//								} else {
+//									fstate.setResult(BindingState.ResultEnum.UNKNOWN);
+//								}
+//							}
+//
+//							@Override
+//							public void onError(Throwable e) {
+//								fstate.setState(BindingState.StateEnum.ERROR);
+//								notifyDataSetChanged();
+//							}
+//
+//							@Override
+//							public void onComplete() {
+//								fstate.setState(BindingState.StateEnum.FINISHED);
+//								notifyDataSetChanged();
+//							}
+//						}
+								new ResponseObserver(fstate, requireUrl)
+						);
 
 			} else if(requireUrl.getMethod().toUpperCase().equals("POST")){
-
+				final String url = requireUrl.getUrl();
+				final Map<String, String> field = new HashMap<>();
+				field.put( requireUrl.getPhoneKey(), number);
+				mRequireUrlsService
+						.getCookies(requireUrl.getCookieUrl())
+						.flatMap(new Function<Response<String>, ObservableSource<String>>() {
+							@Override
+							public ObservableSource<String> apply(Response<String> stringResponse) throws Exception {
+								Headers headers = stringResponse.headers();
+								return mRequireUrlsService.post(
+										url,
+										headers.get("Set-Cookie"),
+										field
+								);
+							}
+						})
+						.subscribeOn(Schedulers.io())
+						.observeOn(AndroidSchedulers.mainThread())
+						.subscribe(new ResponseObserver(fstate, requireUrl));
 			} else {
 
 			}
 
 		}
 	}
+
+
+	class ResponseObserver implements Observer<String>{
+
+		private final BindingState fstate;
+		private final RequireUrl requireUrl;
+
+		public ResponseObserver(BindingState fstate, RequireUrl requireUrl) {
+			this.fstate = fstate;
+			this.requireUrl = requireUrl;
+		}
+
+		@Override
+		public void onSubscribe(Disposable d) {
+			fstate.setState(BindingState.StateEnum.RUNNING);
+			notifyDataSetChanged();
+		}
+
+		@Override
+		public void onNext(String s) {
+			if(s.contains(requireUrl.getIsBind())){
+				fstate.setResult(BindingState.ResultEnum.BINDED);
+			} else if(s.contains(requireUrl.getNoBind())){
+				fstate.setResult(BindingState.ResultEnum.NOBIND);
+			} else {
+				fstate.setResult(BindingState.ResultEnum.UNKNOWN);
+			}
+		}
+
+		@Override
+		public void onError(Throwable e) {
+			fstate.setState(BindingState.StateEnum.ERROR);
+			notifyDataSetChanged();
+		}
+
+		@Override
+		public void onComplete() {
+			fstate.setState(BindingState.StateEnum.FINISHED);
+			notifyDataSetChanged();
+		}
+	}
+
 
 
 	static class ViewHolder extends RecyclerView.ViewHolder{

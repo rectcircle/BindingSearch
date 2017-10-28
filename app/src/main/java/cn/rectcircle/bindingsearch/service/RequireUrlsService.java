@@ -20,5 +20,5 @@ public interface RequireUrlsService {
 	Observable<Response<String>> getCookies(@Url String url);
 
 	@POST
-	Observable<String> post(@Url String url, @FieldMap Map<String, String> fieldMap);
+	Observable<String> post(@Url String url, @Header("Cookie") String cookies, @FieldMap Map<String, String> fieldMap);
 }

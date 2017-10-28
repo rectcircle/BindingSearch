@@ -1,16 +1,29 @@
 {
-  "version": "1",
+  "version": "2",
   "requireUrls": [
     {
       "name": "百度",
-      "url":"https://passport.baidu.com/v2/?regphonecheck&apiver=v3&phone={{phone}}",
+      "url":"https://passport.baidu.com/v2/?regphonecheck&apiver=v3&{{phoneKey}}={{phone}}",
       "loginUrl":"https://passport.baidu.com",
       "logoUrl":"https://www.baidu.com/favicon.ico",
+      "cookieUrl":"https://passport.baidu.com/v2/?reg",
       "method":"get",
+      "phoneKey":"phone",
       "prefix": "{{",
       "suffix": "}}",
       "isBind": "手机号已被注册",
       "noBind": "成功"
+    },
+    {
+      "name": "网易163",
+      "url":"http://reg.email.163.com/unireg/call.do?cmd=added.mobilemail.checkBinding",
+      "loginUrl":"http://mail.163.com",
+      "logoUrl":"http://www.163.com/favicon.ico",
+      "cookieUrl":"http://reg.email.163.com/unireg/call.do?cmd=register.entrance&from=163navi&regPage=163",
+      "method":"post",
+      "phoneKey":"mobile",
+      "isBind": "BOUND",
+      "noBind": "CLEAN"
     }
   ]
 }
