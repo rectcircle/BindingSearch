@@ -6,6 +6,7 @@
       "url":"https://passport.baidu.com/v2/?regphonecheck&apiver=v3&phone={{phone}}",
       "loginUrl":"https://passport.baidu.com",
       "logoUrl":"https://www.baidu.com/favicon.ico",
+      "method":"get",
       "prefix": "{{",
       "suffix": "}}",
       "isBind": "手机号已被注册",

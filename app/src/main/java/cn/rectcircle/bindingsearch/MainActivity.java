@@ -9,14 +9,16 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 import cn.rectcircle.bindingsearch.adapter.BindingAdapter;
+import cn.rectcircle.bindingsearch.model.BindingState;
 import cn.rectcircle.bindingsearch.model.RequireUrls;
 import cn.rectcircle.bindingsearch.model.Version;
 import cn.rectcircle.bindingsearch.service.RequireConfigService;
 import cn.rectcircle.bindingsearch.service.RequireUrlsService;
+import cn.rectcircle.bindingsearch.service.DownloadService;
 import cn.rectcircle.bindingsearch.util.AssetUtil;
 import cn.rectcircle.bindingsearch.util.FileUtil;
 import cn.rectcircle.bindingsearch.util.I18NUtil;
@@ -29,10 +31,17 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.ResponseBody;
+import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
+
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * 控制器
@@ -51,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
 	//Android内置对象
 	private ProgressBar progressBar;
 	private SharedPreferences sharedPref;
+	private RecyclerView bindingRecyclerView;
+	private EditText numberEditText;
 	//ProgressBar
 	//private ProgressDialog dialog;
 
@@ -59,21 +70,19 @@ public class MainActivity extends AppCompatActivity {
 
 	//服务对象
 	private RequireConfigService requireConfigService; //请求配置
-	private RequireUrlsService requireUrlsService; //请求
+	private RequireUrlsService requireUrlsService; //请求url
+	private DownloadService  downloadService;
 
 	//数据缓存对象
 	private Version version;
 	private RequireUrls requireUrls;
-	//TODO 添加请求状态相关的缓存
+	private List<BindingState> bindingStateList;
 
 	//标记量
 	private boolean finishUpdateConfig = false;
 
 	//成员
 	private String gitConfigUrl = GITHUB_CONTENT_URL; //请求配置的地址
-
-	//视图对象
-	private RecyclerView bindingRecyclerView;
 
 	//适配器对象
 	private BindingAdapter bindingAdapter;
@@ -85,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_main);
 
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
+		numberEditText = (EditText) findViewById(R.id.edit_message);
 
 		if(I18NUtil.isZh(this)){
 			gitConfigUrl = GITEE_CONTENT_URL;
@@ -99,8 +109,15 @@ public class MainActivity extends AppCompatActivity {
 		requireUrlsService = new Retrofit.Builder()
 				.baseUrl("https://www.rectcircle.cn/article/")
 				.addConverterFactory(ScalarsConverterFactory.create())
+				.addConverterFactory(ResponseBodyConverterFactory.create())
 				.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
 				.build().create(RequireUrlsService.class);
+
+		downloadService = new Retrofit.Builder()
+				.baseUrl("https://www.rectcircle.cn/article/")
+				.addConverterFactory(ResponseBodyConverterFactory.create())
+				.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+				.build().create(DownloadService.class);
 
 		//从apk包中读取配置文件
 		version = gson.fromJson(AssetUtil.readString(this, VERSION_FILE_NAME),
@@ -208,7 +225,8 @@ public class MainActivity extends AppCompatActivity {
 						//保存配置文件到内部存储
 						FileUtil.saveString(MainActivity.this, REQUIREURLS_FILE_NAME, gson.toJson(requireUrls));
 						//继续初始化bindingRecyclerView视图
-						bindingAdapter = new BindingAdapter(requireUrls.getRequireUrls());
+						bindingStateList = BindingState.create(requireUrls.getRequireUrls());
+						bindingAdapter = new BindingAdapter(bindingStateList, requireUrlsService, downloadService);
 						bindingRecyclerView.setAdapter(bindingAdapter);
 					}
 				}, new Consumer<Throwable>() {
@@ -241,16 +259,41 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	public void getRequiresUrls(View view){
-		requireUrlsService
-				.get("/")
-				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Consumer<String>() {
-					@Override
-					public void accept(String s) throws Exception {
-						//textViewTest.setText(s);
-					}
-				});
+	public void searchBindingWebsite(View view){
+		String number = numberEditText.getText().toString();
+		if(!number.matches("[0-9]{11}")){
+			Toast.makeText(MainActivity.this, "请输入11位手机号", Toast.LENGTH_SHORT).show();
+		} else {
+			bindingAdapter.search(number);
+		}
 	}
 }
+
+
+class ResponseBodyConverterFactory extends Converter.Factory{
+	public static ResponseBodyConverterFactory create() {
+		return new ResponseBodyConverterFactory();
+	}
+	private ResponseBodyConverterFactory() {
+	}
+
+	@Override
+	public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations,
+	                                                        Retrofit retrofit) {
+		if (type == ResponseBody.class) {
+			return ResponseBodyResponseBodyConverter.INSTANCE;
+		}
+
+		return null;
+	}
+
+	static final class ResponseBodyResponseBodyConverter implements Converter<ResponseBody, ResponseBody> {
+		static final ResponseBodyResponseBodyConverter INSTANCE = new ResponseBodyResponseBodyConverter();
+
+		@Override public ResponseBody convert(ResponseBody value) throws IOException {
+			return value;
+		}
+	}
+
+}
+

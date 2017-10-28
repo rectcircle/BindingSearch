@@ -3,12 +3,14 @@ package cn.rectcircle.bindingsearch.model;
 import com.google.gson.annotations.SerializedName;
 
 public class RequireUrl {
+	public static final String PHONE_PARAM = "phone";
 	private String name;
 	private String url;
 	private String loginUrl;
 	private String logoUrl;
-	private String prefix;
-	private String suffix;
+	private String prefix="{{";
+	private String suffix="}}";
+	private String method="get";
 
 	private String isBind;
 	private String noBind;
@@ -78,6 +80,10 @@ public class RequireUrl {
 		this.noBind = noBind;
 	}
 
+	public String getMethod() {
+		return method;
+	}
+
 	@Override
 	public String toString() {
 		return "RequireUrl{" +
@@ -87,9 +93,14 @@ public class RequireUrl {
 				", logoUrl='" + logoUrl + '\'' +
 				", prefix='" + prefix + '\'' +
 				", suffix='" + suffix + '\'' +
+				", method='" + method + '\'' +
 				", isBind='" + isBind + '\'' +
 				", noBind='" + noBind + '\'' +
 				'}';
+	}
+
+	public void setMethod(String method) {
+		this.method = method;
 	}
 
 }

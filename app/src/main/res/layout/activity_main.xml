@@ -34,7 +34,7 @@
 					android:layout_height="wrap_content"
 					android:textAllCaps="false"
 					android:text="@string/search"
-					android:onClick="getRequiresUrls"/>
+					android:onClick="searchBindingWebsite"/>
 		</LinearLayout>
 		<ProgressBar
 				style="?android:attr/progressBarStyle"
