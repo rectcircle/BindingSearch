@@ -119,6 +119,11 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 		for(BindingState state:mBindingStateList){
 			final BindingState fstate = state;
 			final RequireUrl requireUrl = state.getRequireUrl();
+
+			final String url = requireUrl.getUrl();
+			final Map<String, String> params = new HashMap<>(requireUrl.getParams());
+			params.put( requireUrl.getPhoneKey(), number);
+
 			if(requireUrl.getMethod().toUpperCase().equals("GET")){
 				String targetVal = requireUrl.getPrefix()
 						+ RequireUrl.PHONE_PARAM
@@ -127,12 +132,7 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 						+ RequireUrl.PHONE_KEY_PARAM
 						+ requireUrl.getSuffix();
 
-				//真正的get方式请求url
-				final String url = requireUrl.getUrl()
-						.replace(targetKey, requireUrl.getPhoneKey())
-						.replace(targetVal, number);
 				//获取cookies的url
-
 				mRequireUrlsService
 						.getCookies(requireUrl.getCookieUrl())
 						.flatMap(new Function<Response<String>, ObservableSource<String>>() {
@@ -144,7 +144,8 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 								headers.put("Cookie", cookie);
 								return mRequireUrlsService.get(
 										url,
-										headers);
+										headers,
+										params);
 							}
 						})
 						.subscribeOn(Schedulers.io())
@@ -152,9 +153,6 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 						.subscribe(new ResponseObserver(fstate, requireUrl));
 
 			} else if(requireUrl.getMethod().toUpperCase().equals("POST")){
-				final String url = requireUrl.getUrl();
-				final Map<String, String> params = new HashMap<>(requireUrl.getParams());
-				params.put( requireUrl.getPhoneKey(), number);
 				mRequireUrlsService
 						.getCookies(requireUrl.getCookieUrl())
 						.flatMap(new Function<Response<String>, ObservableSource<String>>() {

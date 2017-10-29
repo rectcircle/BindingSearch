@@ -3,16 +3,17 @@
   "requireUrls": [
     {
       "name": "百度",
-      "url":"https://passport.baidu.com/v2/?regphonecheck&apiver=v3&{{phoneKey}}={{phone}}",
+      "url":"https://passport.baidu.com/v2/",
       "loginUrl":"https://passport.baidu.com",
       "logoUrl":"https://www.baidu.com/favicon.ico",
       "cookieUrl":"https://passport.baidu.com/v2/?reg",
       "headers":{},
-      "params":{},
+      "params":{
+        "regphonecheck":"",
+        "apiver":"v3"
+      },
       "method":"get",
       "phoneKey":"phone",
-      "prefix": "{{",
-      "suffix": "}}",
       "bound": "手机号已被注册",
       "noBind": "成功",
       "author":"Rectcircle"
