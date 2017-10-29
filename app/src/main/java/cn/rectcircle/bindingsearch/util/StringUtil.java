@@ -13,6 +13,10 @@ public class StringUtil {
 			sb.append(setCookie.split(";")[0]);
 			sb.append("; ");
 		}
-		return sb.substring(0, sb.length()-2);
+		if(sb.length()==0){
+			return null;
+		} else {
+			return sb.substring(0, sb.length()-2);
+		}
 	}
 }

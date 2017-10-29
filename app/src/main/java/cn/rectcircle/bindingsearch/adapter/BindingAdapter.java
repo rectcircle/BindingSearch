@@ -165,10 +165,12 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 						.flatMap(new Function<Response<String>, ObservableSource<String>>() {
 							@Override
 							public ObservableSource<String> apply(Response<String> stringResponse) throws Exception {
+								Map<String, String> headers = new HashMap<>(requireUrl.getHeaders());
 								List<String> cookieList = stringResponse.headers().values("Set-Cookie");
 								String cookie = StringUtil.getCookieFromSetCookie(cookieList);
-								Map<String, String> headers = new HashMap<>(requireUrl.getHeaders());
-								headers.put("Cookie", cookie);
+								if(cookie!=null){
+									headers.put("Cookie", cookie);
+								}
 								return mRequireUrlsService.post(
 										url,
 										headers,
