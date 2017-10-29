@@ -16,15 +16,31 @@
       "cookieUrl":"选填，获取cookie的地址，一般为注册页面Url",
       //以下为对url参数的配置
       "headers":{}, //选填，某些api需要配置一些请求头（不要填Cookie）
-      "params":{}, //post方式选填，get不填，某些api需要post需要的固定参数，不包括手机号参数
+      "params":{}, //选填，，某些api需要的固定参数，不包括手机号参数,若是get方式，这些参数可以放置到url上，也可以混用，get方式注意参数顺序
       "method":"get", //选填，默认为post，仅支持get、post
       "phoneKey":"phone", //必填，手机参数的key
-      "prefix": "{{", //get方式选填，post方式不填，手机需要替换变量的名字
-      "suffix": "}}", //类似上
-      "bound": "手机号已被注册", //请求接口返回的值的包含此内容表示，该手机号已被绑定
-      "noBind": "成功", //请求接口返回的值的包含此内容表示，该手机号已被绑定
-      "author":"Rectcircle" //给配置分析撰写的作者，将显示到app上
-    }, //例子如下
+      "bound": "手机号已被注册", //必填，请求接口返回的值的包含此内容表示，该手机号已被绑定
+      "noBind": "成功", //必填，请求接口返回的值的包含此内容表示，该手机号已被绑定
+      "author":"Rectcircle" //选填，默认为anonymous，分析撰写该配置的作者，将显示到app上
+    }, 
+    {
+      "name": "百度",
+      "url":"https://passport.baidu.com/v2/",
+      "loginUrl":"https://passport.baidu.com",
+      "logoUrl":"https://www.baidu.com/favicon.ico",
+      "cookieUrl":"https://passport.baidu.com/v2/?reg",
+      "headers":{},
+      "params":{
+        "regphonecheck":"",
+        "apiver":"v3"
+      },
+      "method":"get",
+      "phoneKey":"phone",
+      "bound": "手机号已被注册",
+      "noBind": "成功",
+      "author":"Rectcircle"
+    },
+    //post方式例子如下
     {
       "name": "新浪",
       "url":"https://login.sina.com.cn/signup/check_user.php",

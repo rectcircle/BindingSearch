@@ -15,7 +15,7 @@ import java.util.Map;
 public interface RequireUrlsService {
 	//@Header("Cookie") String cookies
 	@GET
-	Observable<String> get(@Url String url, @HeaderMap Map<String, String> headers, @QueryMap Map<String, String> queryMap);
+	Observable<String> get(@Url String url, @HeaderMap Map<String, String> headers);
 
 	@GET
 	Observable<Response<String>> getCookies(@Url String url);

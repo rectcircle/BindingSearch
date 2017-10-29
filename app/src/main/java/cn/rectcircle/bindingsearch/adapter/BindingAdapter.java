@@ -18,6 +18,7 @@ import cn.rectcircle.bindingsearch.model.RequireUrl;
 import cn.rectcircle.bindingsearch.service.DownloadService;
 import cn.rectcircle.bindingsearch.service.RequireUrlsService;
 import cn.rectcircle.bindingsearch.util.StringUtil;
+import com.google.gson.internal.LinkedHashTreeMap;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
@@ -121,17 +122,12 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 			final RequireUrl requireUrl = state.getRequireUrl();
 
 			final String url = requireUrl.getUrl();
-			final Map<String, String> params = new HashMap<>(requireUrl.getParams());
+			final Map<String, String> params = new LinkedHashTreeMap<>();
+			params.putAll(requireUrl.getParams());
 			params.put( requireUrl.getPhoneKey(), number);
 
 			if(requireUrl.getMethod().toUpperCase().equals("GET")){
-				String targetVal = requireUrl.getPrefix()
-						+ RequireUrl.PHONE_PARAM
-						+ requireUrl.getSuffix();
-				String targetKey = requireUrl.getPrefix()
-						+ RequireUrl.PHONE_KEY_PARAM
-						+ requireUrl.getSuffix();
-
+				final String urlByGet = StringUtil.createGetUrl(url, params);
 				//获取cookies的url
 				mRequireUrlsService
 						.getCookies(requireUrl.getCookieUrl())
@@ -143,9 +139,8 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 								Map<String, String> headers = new HashMap<>(requireUrl.getHeaders());
 								headers.put("Cookie", cookie);
 								return mRequireUrlsService.get(
-										url,
-										headers,
-										params);
+										urlByGet,
+										headers);
 							}
 						})
 						.subscribeOn(Schedulers.io())

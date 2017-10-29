@@ -15,8 +15,6 @@ public class RequireUrl {
 	private String cookieUrl; //默认为loginUrl
 	private String method="get";
 	private String phoneKey="phone";
-	private String prefix="{{";
-	private String suffix="}}";
 	private Map<String, String> headers = new HashMap<>();
 	private Map<String, String> params = new HashMap<>();
 	private String author="anonymous";
@@ -34,8 +32,6 @@ public class RequireUrl {
 				", cookieUrl='" + cookieUrl + '\'' +
 				", method='" + method + '\'' +
 				", phoneKey='" + phoneKey + '\'' +
-				", prefix='" + prefix + '\'' +
-				", suffix='" + suffix + '\'' +
 				", headers=" + headers +
 				", params=" + params +
 				", author='" + author + '\'' +
@@ -125,22 +121,6 @@ public class RequireUrl {
 
 	public void setLogoUrl(String logoUrl) {
 		this.logoUrl = logoUrl;
-	}
-
-	public String getPrefix() {
-		return prefix;
-	}
-
-	public void setPrefix(String prefix) {
-		this.prefix = prefix;
-	}
-
-	public String getSuffix() {
-		return suffix;
-	}
-
-	public void setSuffix(String suffix) {
-		this.suffix = suffix;
 	}
 
 	public String getNoBind() {
