@@ -1,5 +1,5 @@
 {
-  "version": "5",
+  "version": "6",
   "requireUrls": [
     {
       "name": "百度",
@@ -35,7 +35,7 @@
       "name": "新浪",
       "url":"https://login.sina.com.cn/signup/check_user.php",
       "loginUrl":"https://login.sina.com.cn/signup/signin.php",
-      "logoUrl":"http://s0.life.itc.cn/ppweb/images/favicon.ico",
+      "logoUrl":"http://www.sina.com.cn/favicon.ico",
       "cookieUrl":"https://login.sina.com.cn/signup/signup?entry=homepage",
       "headers":{
         "Referer":"https://login.sina.com.cn/signup/signup?entry=homepage"
@@ -54,7 +54,7 @@
       "name": "搜狐",
       "url":"https://passport.sohu.com/signup/check_mobile",
       "loginUrl":"https://passport.sohu.com/user/tologin",
-      "logoUrl":"http://www.sohu.com/favicon.ico",
+      "logoUrl":"http://s0.life.itc.cn/ppweb/images/favicon.ico",
       "method":"post",
       "phoneKey":"mobile",
       "bound": "7",
