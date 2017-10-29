@@ -1,5 +1,5 @@
 {
-  "version": "2",
+  "version": "3",
   "requireUrls": [
     {
       "name": "百度",
@@ -7,12 +7,15 @@
       "loginUrl":"https://passport.baidu.com",
       "logoUrl":"https://www.baidu.com/favicon.ico",
       "cookieUrl":"https://passport.baidu.com/v2/?reg",
+      "headers":{},
+      "params":{},
       "method":"get",
       "phoneKey":"phone",
       "prefix": "{{",
       "suffix": "}}",
-      "isBind": "手机号已被注册",
-      "noBind": "成功"
+      "bound": "手机号已被注册",
+      "noBind": "成功",
+      "author":"Rectcircle"
     },
     {
       "name": "网易163",
@@ -20,10 +23,32 @@
       "loginUrl":"http://mail.163.com",
       "logoUrl":"http://www.163.com/favicon.ico",
       "cookieUrl":"http://reg.email.163.com/unireg/call.do?cmd=register.entrance&from=163navi&regPage=163",
+      "headers":{},
+      "params":{},
       "method":"post",
       "phoneKey":"mobile",
-      "isBind": "BOUND",
-      "noBind": "CLEAN"
+      "bound": "BOUND",
+      "noBind": "CLEAN",
+      "author":"Rectcircle"
+    },
+    {
+      "name": "新浪",
+      "url":"https://login.sina.com.cn/signup/check_user.php",
+      "loginUrl":"https://login.sina.com.cn/signup/signin.php",
+      "logoUrl":"http://www.sina.com.cn/favicon.ico",
+      "cookieUrl":"https://login.sina.com.cn/signup/signup?entry=homepage",
+      "headers":{
+        "Referer":"https://login.sina.com.cn/signup/signup?entry=homepage"
+      },
+      "params":{
+        "from":"mobile",
+        "format":"json"
+      },
+      "method":"post",
+      "phoneKey":"name",
+      "bound": "100001",
+      "noBind": "100000",
+      "author":"Rectcircle"
     }
   ]
 }

@@ -143,12 +143,13 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 						.flatMap(new Function<Response<String>, ObservableSource<String>>() {
 							@Override
 							public ObservableSource<String> apply(Response<String> stringResponse) throws Exception {
-								Headers headers = stringResponse.headers();
-								List<String> cookieList = headers.values("Set-Cookie");
+								List<String> cookieList = stringResponse.headers().values("Set-Cookie");
 								String cookie = StringUtil.getCookieFromSetCookie(cookieList);
+								Map<String, String> headers = new HashMap<>(requireUrl.getHeaders());
+								headers.put("Cookie", cookie);
 								return mRequireUrlsService.get(
 										url,
-										cookie);
+										headers);
 							}
 						})
 						.subscribeOn(Schedulers.io())
@@ -157,20 +158,21 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 
 			} else if(requireUrl.getMethod().toUpperCase().equals("POST")){
 				final String url = requireUrl.getUrl();
-				final Map<String, String> field = new HashMap<>();
-				field.put( requireUrl.getPhoneKey(), number);
+				final Map<String, String> params = new HashMap<>(requireUrl.getParams());
+				params.put( requireUrl.getPhoneKey(), number);
 				mRequireUrlsService
 						.getCookies(requireUrl.getCookieUrl())
 						.flatMap(new Function<Response<String>, ObservableSource<String>>() {
 							@Override
 							public ObservableSource<String> apply(Response<String> stringResponse) throws Exception {
-								Headers headers = stringResponse.headers();
-								List<String> cookieList = headers.values("Set-Cookie");
+								List<String> cookieList = stringResponse.headers().values("Set-Cookie");
 								String cookie = StringUtil.getCookieFromSetCookie(cookieList);
+								Map<String, String> headers = new HashMap<>(requireUrl.getHeaders());
+								headers.put("Cookie", cookie);
 								return mRequireUrlsService.post(
 										url,
-										cookie,
-										field
+										headers,
+										params
 								);
 							}
 						})
@@ -203,7 +205,7 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 
 		@Override
 		public void onNext(String s) {
-			if(s.contains(requireUrl.getIsBind())){
+			if(s.contains(requireUrl.getBound())){
 				fstate.setResult(BindingState.ResultEnum.BINDED);
 			} else if(s.contains(requireUrl.getNoBind())){
 				fstate.setResult(BindingState.ResultEnum.NOBIND);

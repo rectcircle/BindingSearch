@@ -2,6 +2,9 @@ package cn.rectcircle.bindingsearch.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class RequireUrl {
 	public static final String PHONE_PARAM = "phone";
 	public static final String PHONE_KEY_PARAM = "phoneKey";
@@ -14,8 +17,11 @@ public class RequireUrl {
 	private String phoneKey="phone";
 	private String prefix="{{";
 	private String suffix="}}";
+	private Map<String, String> headers = new HashMap<>();
+	private Map<String, String> params = new HashMap<>();
+	private String author="anonymous";
 
-	private String isBind;
+	private String bound;
 	private String noBind;
 
 	@Override
@@ -30,14 +36,50 @@ public class RequireUrl {
 				", phoneKey='" + phoneKey + '\'' +
 				", prefix='" + prefix + '\'' +
 				", suffix='" + suffix + '\'' +
-				", isBind='" + isBind + '\'' +
+				", headers=" + headers +
+				", params=" + params +
+				", author='" + author + '\'' +
+				", bound='" + bound + '\'' +
 				", noBind='" + noBind + '\'' +
 				'}';
 	}
 
+	public Map<String, String> getHeaders() {
+		return headers;
+	}
+
+	public void setHeaders(Map<String, String> headers) {
+		this.headers = headers;
+	}
+
+	public Map<String, String> getParams() {
+		return params;
+	}
+
+	public void setParams(Map<String, String> params) {
+		this.params = params;
+	}
+
+	public String getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
+	public String getBound() {
+		return bound;
+	}
+
+	public void setBound(String bound) {
+		this.bound = bound;
+	}
+
 	public String getCookieUrl() {
-		if(cookieUrl==null)
+		if(cookieUrl==null) {
 			return loginUrl;
+		}
 		return cookieUrl;
 	}
 
@@ -99,14 +141,6 @@ public class RequireUrl {
 
 	public void setSuffix(String suffix) {
 		this.suffix = suffix;
-	}
-
-	public String getIsBind() {
-		return isBind;
-	}
-
-	public void setIsBind(String isBind) {
-		this.isBind = isBind;
 	}
 
 	public String getNoBind() {

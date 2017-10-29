@@ -13,13 +13,14 @@ import java.util.Map;
  *
  */
 public interface RequireUrlsService {
+	//@Header("Cookie") String cookies
 	@GET
-	Observable<String> get(@Url String url, @Header("Cookie") String cookies);
+	Observable<String> get(@Url String url, @HeaderMap Map<String, String> headers );
 
 	@GET
 	Observable<Response<String>> getCookies(@Url String url);
 
 	@POST
 	@FormUrlEncoded
-	Observable<String> post(@Url String url, @Header("Cookie") String cookies, @FieldMap Map<String, String> fieldMap);
+	Observable<String> post(@Url String url, @HeaderMap Map<String, String> headers, @FieldMap Map<String, String> fieldMap);
 }
