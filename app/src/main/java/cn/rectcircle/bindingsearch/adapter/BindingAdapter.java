@@ -18,6 +18,7 @@ import cn.rectcircle.bindingsearch.model.RequireUrl;
 import cn.rectcircle.bindingsearch.service.DownloadService;
 import cn.rectcircle.bindingsearch.service.RequireUrlsService;
 import cn.rectcircle.bindingsearch.util.StringUtil;
+import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -106,13 +107,7 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 		mDownloadService.download(bindingState.getRequireUrl().getLogoUrl())
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Consumer<ResponseBody>() {
-					@Override
-					public void accept(ResponseBody responseBody) throws Exception {
-						Bitmap bm = BitmapFactory.decodeStream(responseBody.byteStream());
-						fholder.logoImageView.setImageBitmap(bm);
-					}
-				});
+				.subscribe(new ImageObserver(fholder));
 	}
 
 	@Override
@@ -184,6 +179,37 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 			} else {
 
 			}
+
+		}
+	}
+
+
+	class ImageObserver implements Observer<ResponseBody>{
+
+		private final ViewHolder holder;
+
+		public ImageObserver(ViewHolder holder) {
+			this.holder = holder;
+		}
+
+		@Override
+		public void onSubscribe(Disposable d) {
+
+		}
+
+		@Override
+		public void onNext(ResponseBody responseBody) {
+			Bitmap bm = BitmapFactory.decodeStream(responseBody.byteStream());
+			holder.logoImageView.setImageBitmap(bm);
+		}
+
+		@Override
+		public void onError(Throwable e) {
+
+		}
+
+		@Override
+		public void onComplete() {
 
 		}
 	}

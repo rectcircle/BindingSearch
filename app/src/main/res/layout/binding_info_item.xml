@@ -21,7 +21,8 @@
 
 				android:id="@+id/logo_img"
 				android:layout_width="wrap_content"
-				android:src="@mipmap/ic_launcher"
+				android:background="#eee"
+				android:contentDescription="logo"
 				android:maxWidth="48dp"
 				android:minWidth="48dp"
 				android:maxHeight="48dp"
