@@ -1,5 +1,5 @@
 {
-  "version": "4",
+  "version": "5",
   "requireUrls": [
     {
       "name": "百度",
@@ -35,7 +35,7 @@
       "name": "新浪",
       "url":"https://login.sina.com.cn/signup/check_user.php",
       "loginUrl":"https://login.sina.com.cn/signup/signin.php",
-      "logoUrl":"http://www.sina.com.cn/favicon.ico",
+      "logoUrl":"http://s0.life.itc.cn/ppweb/images/favicon.ico",
       "cookieUrl":"https://login.sina.com.cn/signup/signup?entry=homepage",
       "headers":{
         "Referer":"https://login.sina.com.cn/signup/signup?entry=homepage"
