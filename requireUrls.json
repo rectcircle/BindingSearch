@@ -1,5 +1,5 @@
 {
-  "version": "3",
+  "version": "4",
   "requireUrls": [
     {
       "name": "百度",
@@ -48,6 +48,17 @@
       "phoneKey":"name",
       "bound": "100001",
       "noBind": "100000",
+      "author":"Rectcircle"
+    },
+    {
+      "name": "搜狐",
+      "url":"https://passport.sohu.com/signup/check_mobile",
+      "loginUrl":"https://passport.sohu.com/user/tologin",
+      "logoUrl":"http://www.sohu.com/favicon.ico",
+      "method":"post",
+      "phoneKey":"mobile",
+      "bound": "7",
+      "noBind": "0",
       "author":"Rectcircle"
     }
   ]
