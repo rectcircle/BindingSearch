@@ -1,12 +1,12 @@
 {
-  "version": "6",
+  "version": "7",
   "requireUrls": [
     {
       "name": "百度",
       "url":"https://passport.baidu.com/v2/",
       "loginUrl":"https://passport.baidu.com",
       "logoUrl":"https://www.baidu.com/favicon.ico",
-      "cookieUrl":"https://passport.baidu.com/v2/?reg",
+      "registerUrl":"https://passport.baidu.com/v2/?reg",
       "headers":{},
       "params":{
         "regphonecheck":"",
@@ -23,7 +23,7 @@
       "url":"http://reg.email.163.com/unireg/call.do?cmd=added.mobilemail.checkBinding",
       "loginUrl":"http://mail.163.com",
       "logoUrl":"http://www.163.com/favicon.ico",
-      "cookieUrl":"http://reg.email.163.com/unireg/call.do?cmd=register.entrance&from=163navi&regPage=163",
+      "registerUrl":"http://reg.email.163.com/unireg/call.do?cmd=register.entrance&from=163navi&regPage=163",
       "headers":{},
       "params":{},
       "method":"post",
@@ -37,10 +37,7 @@
       "url":"https://login.sina.com.cn/signup/check_user.php",
       "loginUrl":"https://login.sina.com.cn/signup/signin.php",
       "logoUrl":"http://www.sina.com.cn/favicon.ico",
-      "cookieUrl":"https://login.sina.com.cn/signup/signup?entry=homepage",
-      "headers":{
-        "Referer":"https://login.sina.com.cn/signup/signup?entry=homepage"
-      },
+      "registerUrl":"https://login.sina.com.cn/signup/signup?entry=homepage",
       "params":{
         "from":"mobile",
         "format":"json"
@@ -56,6 +53,7 @@
       "url":"https://passport.sohu.com/signup/check_mobile",
       "loginUrl":"https://passport.sohu.com/user/tologin",
       "logoUrl":"http://s0.life.itc.cn/ppweb/images/favicon.ico",
+      "registerUrl":"https://passport.sohu.com/signup",
       "method":"post",
       "phoneKey":"mobile",
       "bound": "7",

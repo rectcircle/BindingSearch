@@ -1,25 +1,86 @@
 package cn.rectcircle.bindingsearch.model;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class RequireUrl {
-	public static final String PHONE_PARAM = "phone";
-	public static final String PHONE_KEY_PARAM = "phoneKey";
-	private String name;
-	private String url;
-	private String loginUrl;
-	private String logoUrl;
-	private String cookieUrl; //默认为loginUrl
-	private String method="get";
-	private String phoneKey="phone";
-	private Map<String, String> headers = new HashMap<>();
-	private Map<String, String> params = new HashMap<>();
-	private String author="anonymous";
+	/**
+	 * 时间戳单位：秒
+	 */
+	public static final String TIMESTAMP_UNIT_S = "s";
+	/**
+	 * 时间戳单位：毫秒
+	 */
+	public static final String TIMESTAMP_UNIT_MS = "ms";
 
+
+	/**
+	 * 网站名
+	 */
+	private String name;
+	/**
+	 * 查询手机是否已注册的url
+	 */
+	private String url;
+	/**
+	 * 该网站登录的url
+	 */
+	private String loginUrl;
+	/**
+	 * 该网站logo
+	 */
+	private String logoUrl;
+	/**
+	 * 该网站注册页面url，用于请求cookies和设置请求头的Referer
+	 */
+	private String registerUrl;
+	/**
+	 * url的请求方式
+	 */
+	private String method="get";
+	/**
+	 * 请求参数的手机号码对应的参数名，默认为phone
+	 */
+	private String phoneKey="phone";
+	/**
+	 * 必须设置的请求头信息
+	 */
+	private Map<String, String> headers = new HashMap<>();
+	/**
+	 * 固定的参数
+	 */
+	private Map<String, String> params = new HashMap<>();
+	/**
+	 * 作者
+	 */
+	private String author="anonymous";
+	/**
+	 * 手机号参数拼接的前缀
+	 */
+	private String phoneParamPrefix="";
+	/**
+	 * 手机号参数需要拼接的后缀
+	 */
+	private String phoneParamSuffix="";
+	/**
+	 * 某些网站需要使用时间戳信息，配置参数名，选填
+	 */
+	private String timestampKey=null;
+	/**
+	 * 时间戳单位选填
+	 * s 秒级时间戳（默认）
+	 * ms 毫秒级时间戳
+	 * 选填
+	 */
+	private String timestampUnit=TIMESTAMP_UNIT_S;
+
+	/**
+	 * url返回的字符串包含的此字符串则说明手机号被绑定
+	 */
 	private String bound;
+	/**
+	 * url返回的字符串包含的此字符串则说明手机号未被绑定
+	 */
 	private String noBind;
 
 	@Override
@@ -29,15 +90,51 @@ public class RequireUrl {
 				", url='" + url + '\'' +
 				", loginUrl='" + loginUrl + '\'' +
 				", logoUrl='" + logoUrl + '\'' +
-				", cookieUrl='" + cookieUrl + '\'' +
+				", registerUrl='" + registerUrl + '\'' +
 				", method='" + method + '\'' +
 				", phoneKey='" + phoneKey + '\'' +
 				", headers=" + headers +
 				", params=" + params +
 				", author='" + author + '\'' +
+				", phoneParamPrefix='" + phoneParamPrefix + '\'' +
+				", phoneParamSuffix='" + phoneParamSuffix + '\'' +
+				", timestampKey='" + timestampKey + '\'' +
+				", timestampUnit='" + timestampUnit + '\'' +
 				", bound='" + bound + '\'' +
 				", noBind='" + noBind + '\'' +
 				'}';
+	}
+
+	public String getPhoneParamPrefix() {
+		return phoneParamPrefix;
+	}
+
+	public void setPhoneParamPrefix(String phoneParamPrefix) {
+		this.phoneParamPrefix = phoneParamPrefix;
+	}
+
+	public String getPhoneParamSuffix() {
+		return phoneParamSuffix;
+	}
+
+	public void setPhoneParamSuffix(String phoneParamSuffix) {
+		this.phoneParamSuffix = phoneParamSuffix;
+	}
+
+	public String getTimestampKey() {
+		return timestampKey;
+	}
+
+	public void setTimestampKey(String timestampKey) {
+		this.timestampKey = timestampKey;
+	}
+
+	public String getTimestampUnit() {
+		return timestampUnit;
+	}
+
+	public void setTimestampUnit(String timestampUnit) {
+		this.timestampUnit = timestampUnit;
 	}
 
 	public Map<String, String> getHeaders() {
@@ -72,15 +169,15 @@ public class RequireUrl {
 		this.bound = bound;
 	}
 
-	public String getCookieUrl() {
-		if(cookieUrl==null) {
+	public String getRegisterUrl() {
+		if(registerUrl ==null) {
 			return loginUrl;
 		}
-		return cookieUrl;
+		return registerUrl;
 	}
 
-	public void setCookieUrl(String cookieUrl) {
-		this.cookieUrl = cookieUrl;
+	public void setRegisterUrl(String registerUrl) {
+		this.registerUrl = registerUrl;
 	}
 
 	public String getPhoneKey() {

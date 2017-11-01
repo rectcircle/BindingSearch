@@ -19,16 +19,12 @@ import cn.rectcircle.bindingsearch.service.DownloadService;
 import cn.rectcircle.bindingsearch.service.RequireUrlsService;
 import cn.rectcircle.bindingsearch.util.StringUtil;
 import com.google.gson.internal.LinkedHashTreeMap;
-import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.Headers;
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
@@ -124,20 +120,32 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 			final String url = requireUrl.getUrl();
 			final Map<String, String> params = new LinkedHashTreeMap<>();
 			params.putAll(requireUrl.getParams());
-			params.put( requireUrl.getPhoneKey(), number);
+			//配置手机号参数
+			params.put(requireUrl.getPhoneKey(),
+					requireUrl.getPhoneParamPrefix()
+							+number
+							+requireUrl.getPhoneParamSuffix());
 
 			if(requireUrl.getMethod().toUpperCase().equals("GET")){
 				final String urlByGet = StringUtil.createGetUrl(url, params);
 				//获取cookies的url
 				mRequireUrlsService
-						.getCookies(requireUrl.getCookieUrl())
+						.getCookies(requireUrl.getRegisterUrl())
 						.flatMap(new Function<Response<String>, ObservableSource<String>>() {
 							@Override
 							public ObservableSource<String> apply(Response<String> stringResponse) throws Exception {
+								Map<String, String> headers = new HashMap<>(requireUrl.getHeaders());
 								List<String> cookieList = stringResponse.headers().values("Set-Cookie");
 								String cookie = StringUtil.getCookieFromSetCookie(cookieList);
-								Map<String, String> headers = new HashMap<>(requireUrl.getHeaders());
-								headers.put("Cookie", cookie);
+								//配置cookie
+								if(cookie!=null){
+									headers.put("Cookie", cookie);
+								}
+								//配置Referer，解决可能出现的跨域问题
+								headers.put("Referer", requireUrl.getRegisterUrl());
+
+								//配置时间戳参数
+								headleTimestampParam(requireUrl, params);
 								return mRequireUrlsService.get(
 										urlByGet,
 										headers);
@@ -149,7 +157,7 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 
 			} else if(requireUrl.getMethod().toUpperCase().equals("POST")){
 				mRequireUrlsService
-						.getCookies(requireUrl.getCookieUrl())
+						.getCookies(requireUrl.getRegisterUrl())
 						.flatMap(new Function<Response<String>, ObservableSource<String>>() {
 							@Override
 							public ObservableSource<String> apply(Response<String> stringResponse) throws Exception {
@@ -159,6 +167,12 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 								if(cookie!=null){
 									headers.put("Cookie", cookie);
 								}
+								//配置Referer，解决可能出现的跨域问题
+								headers.put("Referer", requireUrl.getRegisterUrl());
+
+								//配置时间戳参数
+								headleTimestampParam(requireUrl, params);
+
 								return mRequireUrlsService.post(
 										url,
 										headers,
@@ -245,6 +259,17 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 		public void onComplete() {
 			fstate.setState(BindingState.StateEnum.FINISHED);
 			notifyDataSetChanged();
+		}
+	}
+
+	private void headleTimestampParam(RequireUrl requireUrl, Map<String, String> params){
+		if(requireUrl.getTimestampKey() != null &&
+				(!"".equals(requireUrl.getTimestampKey()))){
+			if(requireUrl.getTimestampUnit().equals(RequireUrl.TIMESTAMP_UNIT_S)){
+				params.put(requireUrl.getTimestampKey(), ""+System.currentTimeMillis()/1000);
+			} else if(requireUrl.getTimestampUnit().equals(RequireUrl.TIMESTAMP_UNIT_MS)){
+				params.put(requireUrl.getTimestampKey(), ""+System.currentTimeMillis());
+			}
 		}
 	}
 
