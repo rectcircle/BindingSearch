@@ -68,6 +68,11 @@ public class BindingState {
 
 	public String getFinalState(){
 		String res;
+
+		if(requireUrl.getDisable().booleanValue()){
+			return "不支持："+requireUrl.getDisableDescription();
+		}
+
 		switch (state){
 			case WAITING: res = "等待中...";break;
 			case RUNNING: res = "查询中...";break;

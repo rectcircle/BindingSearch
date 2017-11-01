@@ -1,5 +1,5 @@
 {
-  "version": "7",
+  "version": "8",
   "requireUrls": [
     {
       "name": "百度",
@@ -59,6 +59,74 @@
       "bound": "7",
       "noBind": "0",
       "author":"Rectcircle"
+    },
+    {
+      "name": "京东",
+      "url":"https://reg.jd.com/validateuser/isMobileEngaged",
+      "loginUrl":"https://passport.jd.com/new/login.aspx",
+      "logoUrl":"https://www.jd.com/favicon.ico",
+      "registerUrl":"https://reg.jd.com/reg/person",
+      "params":{},
+      "method":"get",
+      "phoneKey":"mobile",
+      "phoneParamPrefix":"+0086",
+      "timestampKey":"_",
+      "timestampUnit":"ms",
+      "delayMs":3000,
+      "bound": ":1",
+      "noBind": ":0",
+      "author":"Hartone"
+    },
+    {
+
+      "name": "新浪微博",
+      "url":"http://weibo.com/signup/v5/formcheck",
+      "loginUrl":"http://weibo.com/login.php",
+      "logoUrl":"http://weibo.com/favicon.ico",
+      "registerUrl":"http://weibo.com/signup/signup.php",
+      "params":{
+        "type":"mobilesea",
+        "zone":"0086",
+        "from":""
+      },
+      "method":"get",
+      "phoneKey":"value",
+      "timestampKey":"__rnd",
+      "timestampUnit":"ms",
+      "bound": "600001",
+      "noBind": "100000",
+      "author":"Hartone"
+    },
+    {
+      "name": "淘宝",
+      "disable":"true",
+      "loginUrl":"https://login.taobao.com/member/login.jhtml",
+      "logoUrl":"https://www.taobao.com/favicon.ico",
+      "author":"Rectcircle"
+    },
+    {
+      "name": "支付宝",
+      "disable":"true",
+      "disableDescription":"未找到相关接口",
+      "loginUrl":"https://www.alipay.com/",
+      "logoUrl":"https://www.alipay.com/favicon.ico",
+      "author":"Rectcircle"
+    },
+    {
+      "name": "去哪儿网",
+      "disable":"true",
+      "disableDescription":"需要输入验证码",
+      "loginUrl":"https://user.qunar.com/passport/login.jsp",
+      "logoUrl":"https://user.qunar.com/favicon.ico",
+      "author":"Hartone"
+    },
+    {
+      "name": "携程",
+      "disable":"true",
+      "disableDescription":"需要输入验证码",
+      "loginUrl":"https://accounts.ctrip.com/member/login.aspx",
+      "logoUrl":"https://accounts.ctrip.com/favicon.ico",
+      "author":"Hartone"
     }
   ]
 }

@@ -168,7 +168,11 @@ public class MainActivity extends AppCompatActivity {
 
 		if(NetWorkStateUtil.isNetworkConnected(this)){
 			//从网络中检查配置
-			changeConfigFromNetwork();
+//			changeConfigFromNetwork();
+			//继续初始化bindingRecyclerView视图
+			bindingStateList = BindingState.create(requireUrls.getRequireUrls());
+			bindingAdapter = new BindingAdapter(bindingStateList, requireUrlsService, downloadService);
+			bindingRecyclerView.setAdapter(bindingAdapter);
 		} else {
 			showNetworkAlertDialog();
 		}

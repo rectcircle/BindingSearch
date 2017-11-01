@@ -51,4 +51,14 @@ public class StringUtil {
 		}
 		return sb.toString();
 	}
+
+	public static String urlEncode(String src){
+		try {
+			return URLEncoder.encode(src, "utf8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 }

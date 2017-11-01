@@ -13,6 +13,15 @@ public class RequireUrl {
 	 */
 	public static final String TIMESTAMP_UNIT_MS = "ms";
 
+	/**
+	 * 当网站是否可以查询
+	 */
+	private Boolean disable=false;
+	/**
+	 * 不能使用的原因
+
+	 */
+	private String disableDescription;
 
 	/**
 	 * 网站名
@@ -43,6 +52,11 @@ public class RequireUrl {
 	 */
 	private String phoneKey="phone";
 	/**
+	 * 手机号参数的的位置
+	 */
+	private Integer phonePosition=null;
+	/**
+
 	 * 必须设置的请求头信息
 	 */
 	private Map<String, String> headers = new HashMap<>();
@@ -72,7 +86,12 @@ public class RequireUrl {
 	 * ms 毫秒级时间戳
 	 * 选填
 	 */
-	private String timestampUnit=TIMESTAMP_UNIT_S;
+	private String timestampUnit=TIMESTAMP_UNIT_MS;
+
+	/**
+	 * 获取cookies后延时请求
+	 */
+	private Integer delayMs = 0;
 
 	/**
 	 * url返回的字符串包含的此字符串则说明手机号被绑定
@@ -83,16 +102,53 @@ public class RequireUrl {
 	 */
 	private String noBind;
 
+
+
+	public Integer getPhonePosition() {
+		return phonePosition;
+	}
+
+	public void setPhonePosition(Integer phonePosition) {
+		this.phonePosition = phonePosition;
+	}
+
+	public Integer getDelayMs() {
+		return delayMs;
+	}
+
+	public void setDelayMs(Integer delayMs) {
+		this.delayMs = delayMs;
+	}
+
+	public Boolean getDisable() {
+		return disable;
+	}
+
+	public void setDisable(Boolean disable) {
+		this.disable = disable;
+	}
+
+	public String getDisableDescription() {
+		return disableDescription;
+	}
+
+	public void setDisableDescription(String disableDescription) {
+		this.disableDescription = disableDescription;
+	}
+
 	@Override
 	public String toString() {
 		return "RequireUrl{" +
-				"name='" + name + '\'' +
+				"disable=" + disable +
+				", disableDescription='" + disableDescription + '\'' +
+				", name='" + name + '\'' +
 				", url='" + url + '\'' +
 				", loginUrl='" + loginUrl + '\'' +
 				", logoUrl='" + logoUrl + '\'' +
 				", registerUrl='" + registerUrl + '\'' +
 				", method='" + method + '\'' +
 				", phoneKey='" + phoneKey + '\'' +
+				", phonePosition=" + phonePosition +
 				", headers=" + headers +
 				", params=" + params +
 				", author='" + author + '\'' +
@@ -100,6 +156,7 @@ public class RequireUrl {
 				", phoneParamSuffix='" + phoneParamSuffix + '\'' +
 				", timestampKey='" + timestampKey + '\'' +
 				", timestampUnit='" + timestampUnit + '\'' +
+				", delayMs=" + delayMs +
 				", bound='" + bound + '\'' +
 				", noBind='" + noBind + '\'' +
 				'}';

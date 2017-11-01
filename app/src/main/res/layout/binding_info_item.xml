@@ -18,15 +18,14 @@
 			android:layout_marginBottom="5dp"
 			android:layout_marginTop="5dp">
 		<ImageView
-
 				android:id="@+id/logo_img"
-				android:layout_width="wrap_content"
-				android:background="#eee"
-				android:contentDescription="logo"
+				android:layout_width="48dp"
+				android:background="#fff"
 				android:maxWidth="48dp"
 				android:minWidth="48dp"
 				android:maxHeight="48dp"
 				android:minHeight="48dp"
+				android:adjustViewBounds="true"
 				android:layout_height="wrap_content"/>
 
 		<LinearLayout
@@ -63,6 +62,8 @@
 						android:layout_gravity="center_vertical"
 						android:text="加载中..."
 						android:textSize="12sp"
+						android:lines="1"
+						android:ellipsize="end"
 						android:gravity="center_vertical"/>
 			</LinearLayout>
 

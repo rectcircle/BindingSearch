@@ -28,9 +28,7 @@ import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 绑定信息适配器
@@ -40,6 +38,7 @@ import java.util.Map;
 public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHolder> {
 
 	private List<BindingState> mBindingStateList;
+	private List<Bitmap> logoBitmapList;
 
 	private RequireUrlsService mRequireUrlsService;
 
@@ -51,6 +50,10 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 		mBindingStateList = bindingStateList;
 		mRequireUrlsService = requireUrlsService;
 		mDownloadService = downloadService;
+		logoBitmapList=new ArrayList<>(mBindingStateList.size());
+		for(int i=0; i<mBindingStateList.size();i++){
+			logoBitmapList.add(null);
+		}
 	}
 
 	@Override
@@ -101,10 +104,14 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 		holder.websiteNameTextView.setText(bindingState.getRequireUrl().getName());
 		holder.stateTextView.setText(bindingState.getFinalState());
 		//请求图片
-		mDownloadService.download(bindingState.getRequireUrl().getLogoUrl())
-				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new ImageObserver(fholder));
+		if(logoBitmapList.get(position)==null){
+			mDownloadService.download(bindingState.getRequireUrl().getLogoUrl())
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe(new ImageObserver(fholder, position));
+		} else {
+			holder.logoImageView.setImageBitmap(logoBitmapList.get(position));
+		}
 	}
 
 	@Override
@@ -114,17 +121,17 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 
 	public void search(String number) {
 		for(BindingState state:mBindingStateList){
+
 			final BindingState fstate = state;
 			final RequireUrl requireUrl = state.getRequireUrl();
 
+			if(requireUrl.getDisable().booleanValue()){
+				continue;
+			}
+
 			final String url = requireUrl.getUrl();
 			final Map<String, String> params = new LinkedHashTreeMap<>();
-			params.putAll(requireUrl.getParams());
-			//配置手机号参数
-			params.put(requireUrl.getPhoneKey(),
-					requireUrl.getPhoneParamPrefix()
-							+number
-							+requireUrl.getPhoneParamSuffix());
+			handleParam(requireUrl,params,number);
 
 			if(requireUrl.getMethod().toUpperCase().equals("GET")){
 				final String urlByGet = StringUtil.createGetUrl(url, params);
@@ -145,7 +152,12 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 								headers.put("Referer", requireUrl.getRegisterUrl());
 
 								//配置时间戳参数
-								headleTimestampParam(requireUrl, params);
+								handleTimestampParam(requireUrl, params);
+
+								if(requireUrl.getDelayMs()!=0){
+									Thread.sleep(requireUrl.getDelayMs());
+								}
+
 								return mRequireUrlsService.get(
 										urlByGet,
 										headers);
@@ -171,7 +183,11 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 								headers.put("Referer", requireUrl.getRegisterUrl());
 
 								//配置时间戳参数
-								headleTimestampParam(requireUrl, params);
+								handleTimestampParam(requireUrl, params);
+
+								if(requireUrl.getDelayMs()!=0){
+									Thread.sleep(requireUrl.getDelayMs());
+								}
 
 								return mRequireUrlsService.post(
 										url,
@@ -190,13 +206,48 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 		}
 	}
 
+	private void handleParam(RequireUrl requireUrl, Map<String, String> params, String number){
+		int i=0;
+		boolean hasPosition = requireUrl.getPhonePosition()!=null && i == requireUrl.getPhonePosition();
+		String phoneKey = requireUrl.getPhoneKey();
+		String phoneValue = requireUrl.getPhoneParamPrefix()
+				+number
+				+requireUrl.getPhoneParamSuffix();
+		for (Map.Entry<String, String> entry:requireUrl.getParams().entrySet()) {
+			if(hasPosition){
+				params.put(phoneKey, phoneValue);
+				i++;
+			}
+			params.put(entry.getKey(), entry.getValue());
+			i++;
+		}
+
+		if(!hasPosition){
+			params.put(phoneKey, phoneValue);
+		}
+
+	}
+
+	private void handleTimestampParam(RequireUrl requireUrl, Map<String, String> params){
+		if(requireUrl.getTimestampKey() != null &&
+				(!"".equals(requireUrl.getTimestampKey()))){
+			long ms = System.currentTimeMillis() ;//- requireUrl.getDelayMs();
+			if(requireUrl.getTimestampUnit().equals(RequireUrl.TIMESTAMP_UNIT_S)){
+				params.put(requireUrl.getTimestampKey(), ""+ms/1000);
+			} else if(requireUrl.getTimestampUnit().equals(RequireUrl.TIMESTAMP_UNIT_MS)){
+				params.put(requireUrl.getTimestampKey(), ""+ms);
+			}
+		}
+	}
 
 	class ImageObserver implements Observer<ResponseBody>{
 
 		private final ViewHolder holder;
+		private final int position;
 
-		public ImageObserver(ViewHolder holder) {
+		public ImageObserver(ViewHolder holder, int position) {
 			this.holder = holder;
+			this.position = position;
 		}
 
 		@Override
@@ -208,6 +259,7 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 		public void onNext(ResponseBody responseBody) {
 			Bitmap bm = BitmapFactory.decodeStream(responseBody.byteStream());
 			holder.logoImageView.setImageBitmap(bm);
+			logoBitmapList.set(position, bm);
 		}
 
 		@Override
@@ -220,7 +272,6 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 
 		}
 	}
-
 
 	class ResponseObserver implements Observer<String>{
 
@@ -261,19 +312,6 @@ public class BindingAdapter extends RecyclerView.Adapter<BindingAdapter.ViewHold
 			notifyDataSetChanged();
 		}
 	}
-
-	private void headleTimestampParam(RequireUrl requireUrl, Map<String, String> params){
-		if(requireUrl.getTimestampKey() != null &&
-				(!"".equals(requireUrl.getTimestampKey()))){
-			if(requireUrl.getTimestampUnit().equals(RequireUrl.TIMESTAMP_UNIT_S)){
-				params.put(requireUrl.getTimestampKey(), ""+System.currentTimeMillis()/1000);
-			} else if(requireUrl.getTimestampUnit().equals(RequireUrl.TIMESTAMP_UNIT_MS)){
-				params.put(requireUrl.getTimestampKey(), ""+System.currentTimeMillis());
-			}
-		}
-	}
-
-
 
 	static class ViewHolder extends RecyclerView.ViewHolder{
 		ImageView logoImageView;

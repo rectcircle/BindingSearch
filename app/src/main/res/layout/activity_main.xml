@@ -28,6 +28,7 @@
 					android:inputType="number"
 					android:maxLength="11"
 					android:layout_height="wrap_content"
+					android:text="13951463990"
 					android:hint="@string/please_input_your_phone_number"/>
 			<Button
 					android:layout_width="wrap_content"
